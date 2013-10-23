@@ -30,6 +30,8 @@ module.exports = Em.Component.extend({
 
     isModal: true,
 
+    modalMask: null,
+
     closable: true,
 
     zIndex: null,
