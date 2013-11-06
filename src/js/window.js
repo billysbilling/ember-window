@@ -61,7 +61,7 @@ module.exports = Em.Component.extend({
     
     show: function() {
         var self = this;
-        this.appendTo(Billy.get('rootElement'));
+        this.appendTo(this.container.lookup('application:main').get('rootElement'));
         if (this.get('isModal')) {
             var modalMask = this.container.lookup('component:modal-mask');
             this.set('modalMask', modalMask);
