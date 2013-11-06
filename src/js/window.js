@@ -163,6 +163,9 @@ module.exports = Em.Component.extend({
     actions: {
         cancel: function() {
             this.cancel();
+        },
+        close: function() {
+            this.close();
         }
     },
 
