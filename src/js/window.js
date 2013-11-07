@@ -67,13 +67,17 @@ module.exports = Em.Component.extend({
             this.set('modalMask', modalMask);
             modalMask.set('zIndex', this.get('zIndex') - 1);
             modalMask.show();
-            modalMask.on('click', function() {
-                if (self.get('closable')) {
-                    self.cancel();
-                } else {
-                    self._pulse();
-                }
-            });
+            //Wait a second until listening for click events on modal mask. If user double clicks on an item which opens
+            //the window, we don't want to hide it again, which the second click would otherwise do. 
+            setTimeout(function() {
+                modalMask.on('click', function() {
+                    if (self.get('closable')) {
+                        self.cancel();
+                    } else {
+                        self._pulse();
+                    }
+                });
+            }, 1000);
         }
     },
     
