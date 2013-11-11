@@ -104,6 +104,7 @@ module.exports = Em.Component.extend({
     },
 
     doClose: function() {
+        var self = this;
         return this.animateDestroy().then(function() {
             self.trigger('didClose');
             self.destroy();
