@@ -30,6 +30,8 @@ module.exports = Em.Component.extend({
 
     isModal: true,
 
+    focusSelector: null,
+
     modalMask: null,
 
     closable: true,
@@ -121,12 +123,17 @@ module.exports = Em.Component.extend({
 
     didInsertElement: function() {
         this._super();
-        var el = this.$();
+        var self = this,
+            el = this.$(),
+            focusSelector = this.get('focusSelector');
         this._sizeBody();
         $(window).on('resize', Billy.proxy(this._sizeBody, this));
         el.css('top', this.get('top') + 'px');
         setTimeout(function() {
             el.addClass('visible');
+            if (focusSelector) {
+                self.$(focusSelector).focus();
+            }
         }, 0);
     },
     
