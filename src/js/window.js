@@ -39,6 +39,8 @@ module.exports = Em.Component.extend({
     zIndex: null,
 
     width: 500,
+    
+    isClosing: false,
 
     willClose: function() {
 
@@ -107,6 +109,7 @@ module.exports = Em.Component.extend({
 
     doClose: function() {
         var self = this;
+        this.set('isClosing', true);
         return this.animateDestroy().then(function() {
             self.trigger('didClose');
             self.destroy();
@@ -188,5 +191,5 @@ module.exports = Em.Component.extend({
 });
 
 module.exports.hasWindows = function() {
-    return stack.length > 0;
+    return stack.length > 0 && stack.any(function(w) { return !w.get('isClosing'); });
 };
