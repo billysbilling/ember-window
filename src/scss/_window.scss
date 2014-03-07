@@ -3,7 +3,9 @@
 @mixin window {
     .window {
         $window-padding: 20px;
-        
+        $close-icon-size: 12px;
+        $close-icon-offset: ($large-line-height + 2*$tight-standard-padding - $close-icon-size) / 2;
+
         position: fixed;
         top: $standard-padding;
         left: 50%;
@@ -14,28 +16,6 @@
         @include transform(scale(0.5, 0.5));
         opacity: 0;
         
-        .close {
-            $size: 12px;
-            $offset: ($large-line-height + 2*$tight-standard-padding - $size) / 2;
-            cursor: pointer;
-            position: absolute;
-            top: $offset;
-            right: $offset;
-            width: $size;
-            height: $size;
-            display: block;
-    
-            .svg-main {
-                fill: $font-color;
-            }
-            
-            &:hover {
-                .svg-main {
-                    fill: $blue;
-                }
-            }
-        }
-        
         .window-header {
             height: $large-line-height + 2*$tight-standard-padding + 1px;
             padding: $tight-standard-padding $window-padding;
@@ -43,6 +23,32 @@
             background-color: $background-gray;
             border-bottom: 1px solid $border-gray;
             @include border-top-radius($standard-border-radius);
+        }
+
+        .close {
+            cursor: pointer;
+            position: absolute;
+            top: $close-icon-offset;
+            right: $close-icon-offset;
+            width: $close-icon-size;
+            height: $close-icon-size;
+            display: block;
+
+            .svg-main {
+                fill: $font-color;
+            }
+
+            &:hover {
+                .svg-main {
+                    fill: $blue;
+                }
+            }
+        }
+        
+        .window-closable {
+            .window-header {
+                padding-right: 2*$close-icon-offset + $close-icon-size;
+            }
         }
         
         .window-body {

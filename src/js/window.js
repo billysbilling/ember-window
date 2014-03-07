@@ -20,6 +20,8 @@ module.exports = Em.Component.extend({
     
     classNames: ['window', 'layer'],
     
+    classNameBindings: ['window-closable'],
+    
     attributeBindings: ['style'],
     
     viewportPadding: 10,
