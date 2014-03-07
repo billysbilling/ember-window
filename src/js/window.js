@@ -19,8 +19,8 @@ module.exports = Em.Component.extend({
     layout: require('../templates/window-layout'),
     
     classNames: ['window', 'layer'],
-    
-    classNameBindings: ['window-closable'],
+
+    classNameBindings: ['closable:window-closable'],
     
     attributeBindings: ['style'],
     

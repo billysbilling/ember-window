@@ -45,7 +45,7 @@
             }
         }
         
-        .window-closable {
+        &.window-closable {
             .window-header {
                 padding-right: 2*$close-icon-offset + $close-icon-size;
             }
