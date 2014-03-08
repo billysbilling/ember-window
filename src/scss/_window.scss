@@ -23,6 +23,10 @@
             background-color: $background-gray;
             border-bottom: 1px solid $border-gray;
             @include border-top-radius($standard-border-radius);
+
+            h1 {
+                @include ellipsis;
+            }
         }
 
         .close {
