@@ -1,3 +1,5 @@
+var functionProxy = require('function-proxy');
+
 var stack = [];
 
 function register(win) {
@@ -132,7 +134,7 @@ module.exports = Em.Component.extend({
             el = this.$(),
             focusSelector = this.get('focusSelector');
         this._sizeBody();
-        $(window).on('resize', Billy.proxy(this._sizeBody, this));
+        $(window).on('resize', functionProxy(this._sizeBody, this));
         el.css('top', this.get('top') + 'px');
         setTimeout(function() {
             el.addClass('visible');
@@ -144,7 +146,7 @@ module.exports = Em.Component.extend({
     
     willDestroyElement: function() {
         this._super();
-        $(window).off('resize', Billy.proxy(this._sizeBody, this));
+        $(window).off('resize', functionProxy(this._sizeBody, this));
     },
 
     _sizeBody: function() {
