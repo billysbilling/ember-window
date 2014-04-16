@@ -1,14 +1,20 @@
 var functionProxy = require('function-proxy');
 
-var stack = [];
+var ANIMATION_DURATION = 300,
+    MODAL_MASK_CLICK_TOLERANCE = 1000,
+    TOP_OFFSET_INCREMENT = 10,
+    stack = [];
 
 function register(win) {
     deregister(win);
-    var top = stack.get('lastObject');
-    if (top) {
-        win.set('zIndex', top.get('zIndex') + 10);
+    var topWin = stack.get('lastObject');
+    if (topWin) {
+        win.set('zIndex', topWin.get('zIndex') + 10);
     } else {
         win.set('zIndex', 2000);
+    }
+    if (win.get('win') === null) {
+        win.set('topOffset', topWin ? TOP_OFFSET_INCREMENT + topWin.get('topOffset') : 0);
     }
     stack.pushObject(win);
 }
@@ -19,13 +25,19 @@ function deregister(win) {
 
 module.exports = Em.Component.extend({
     layout: require('../templates/window-layout'),
-    
+
     classNames: ['window', 'layer'],
 
-    classNameBindings: ['closable:window-closable'],
-    
+    classNameBindings: ['closable:window-closable', 'animated:window-animated'],
+
     attributeBindings: ['style'],
-    
+
+    animated: true,
+
+    animationDuration: function() {
+        return this.get('animated') ? ANIMATION_DURATION : 0;
+    }.property('animated'),
+
     viewportPadding: 10,
 
     topOffset: null,
@@ -43,7 +55,7 @@ module.exports = Em.Component.extend({
     zIndex: null,
 
     width: 500,
-    
+
     isClosing: false,
 
     willClose: function() {
@@ -52,8 +64,6 @@ module.exports = Em.Component.extend({
 
     init: function() {
         this._super();
-        var topWin = stack.get('lastObject');
-        this.set('topOffset', topWin ? 10 + topWin.get('topOffset') : 0);
         register(this);
     },
 
@@ -66,29 +76,42 @@ module.exports = Em.Component.extend({
         s.push('margin-left:-'+(width/2)+'px;');
         return s.join(' ');
     }.property('zIndex', 'width'),
-    
+
     show: function() {
         var self = this;
         this.appendTo(this.container.lookup('application:main').get('rootElement'));
         if (this.get('isModal')) {
-            var modalMask = this.container.lookup('component:modal-mask');
-            this.set('modalMask', modalMask);
-            modalMask.set('zIndex', this.get('zIndex') - 1);
-            modalMask.show();
+            var modalMask = this.get('modalMask'); //this window may have replaced another window and inherited its modal mask
+            if (!modalMask) {
+                modalMask = this.container.lookup('component:modal-mask');
+                this.set('modalMask', modalMask);
+                modalMask.set('zIndex', this.get('zIndex') - 1);
+                modalMask.show();
+            }
             //Wait a second until listening for click events on modal mask. If user double clicks on an item which opens
-            //the window, we don't want to hide it again, which the second click would otherwise do. 
+            //the window, we don't want to hide it again, which the second click would otherwise do.
+            modalMask.on('click', this, this.didClickModalMask);
             setTimeout(function() {
-                modalMask.on('click', function() {
-                    if (self.get('closable')) {
-                        self.cancel();
-                    } else {
-                        self._pulse();
-                    }
-                });
+
             }, 1000);
         }
+        return new Em.RSVP.Promise(function(resolve) {
+            self.one('didShow', function() {
+                resolve();
+            });
+        });
     },
-    
+
+    didClickModalMask: function() {
+        if (Date.now() - this.get('modalMask.insertTime') >= MODAL_MASK_CLICK_TOLERANCE) {
+            if (this.get('closable')) {
+                this.cancel();
+            } else {
+                this._pulse();
+            }
+        }
+    },
+
     cancel: function() {
         if (this.trigger('willCancel') === false) {
             return;
@@ -120,11 +143,30 @@ module.exports = Em.Component.extend({
         });
     },
 
+    replaceWith: function(other) {
+        var modalMask = this.get('modalMask');
+        if (modalMask) {
+            other.set('modalMask', modalMask);
+            this.set('modalMask', null);
+            modalMask.off('click', this, this.didClickModalMask);
+        }
+
+        other.set('topOffset', this.get('topOffset'));
+
+        this.set('animated', false);
+        other.set('animated', false);
+        other.one('didShow', function() {
+            other.set('animated', true);
+        });
+
+        this.cancel();
+    },
+
     willDestroy: function() {
         deregister(this);
 
         var modalMask = this.get('modalMask');
-        if (modalMask) {
+        if (modalMask && !modalMask.get('isAnimateDestroying')) {
             modalMask.destroy();
         }
     },
@@ -140,14 +182,17 @@ module.exports = Em.Component.extend({
         this._sizeBody();
         $(window).on('resize', functionProxy(this._sizeBody, this));
         el.css('top', this.get('top') + 'px');
+        el.addClass('visible');
         Em.run.later(this, function() {
-            el.addClass('visible');
-            if (focusSelector) {
+            this.trigger('didShow');
+        }, this.get('animationDuration'));
+        if (focusSelector) {
+            Em.run.next(this, function() {
                 this.$(focusSelector).focus();
-            }
-        }, 0);
+            }, 0);
+        }
     },
-    
+
     willDestroyElement: function() {
         this._super();
         $(window).off('resize', functionProxy(this._sizeBody, this));
@@ -179,10 +224,10 @@ module.exports = Em.Component.extend({
             Em.run.later(self, function() {
                 self.destroy();
                 resolve();
-            }, 300);
+            }, self.get('animationDuration'));
         });
     },
-    
+
     actions: {
         cancel: function() {
             this.cancel();
