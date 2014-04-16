@@ -122,6 +122,11 @@ module.exports = Em.Component.extend({
 
     willDestroy: function() {
         deregister(this);
+
+        var modalMask = this.get('modalMask');
+        if (modalMask) {
+            modalMask.destroy();
+        }
     },
 
     top: function() {
