@@ -135,16 +135,15 @@ module.exports = Em.Component.extend({
 
     didInsertElement: function() {
         this._super();
-        var self = this,
-            el = this.$(),
+        var el = this.$(),
             focusSelector = this.get('focusSelector');
         this._sizeBody();
         $(window).on('resize', functionProxy(this._sizeBody, this));
         el.css('top', this.get('top') + 'px');
-        setTimeout(function() {
+        Em.run.later(this, function() {
             el.addClass('visible');
             if (focusSelector) {
-                self.$(focusSelector).focus();
+                this.$(focusSelector).focus();
             }
         }, 0);
     },
