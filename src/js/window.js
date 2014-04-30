@@ -46,7 +46,7 @@ module.exports = Em.Component.extend({
 
     isModal: true,
 
-    focusSelector: null,
+    focusSelector: ':input:not([disabled]):first',
 
     modalMask: null,
 
