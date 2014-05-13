@@ -228,6 +228,26 @@ module.exports = Em.Component.extend({
         });
     },
 
+    didKeyDown: function(e) {
+        var key = e.keyCode || e.which;
+        switch (key) {
+            case $.keyCode.ESCAPE:
+                //Close the window on escape
+                e.preventDefault();
+                this.cancel();
+                break;
+            case $.keyCode.TAB:
+                //Prevent tabbing outside the window
+                var tabbable = this.$(':tabbable'),
+                    finalTabbable = tabbable[e.shiftKey ? 'first' : 'last']()[0];
+                if (finalTabbable === document.activeElement) {
+                    e.preventDefault();
+                    tabbable[e.shiftKey ? 'last' : 'first']()[0].focus();
+                }
+                break;
+        }
+    }.on('keyDown'),
+
     actions: {
         cancel: function() {
             this.cancel();
