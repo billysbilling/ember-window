@@ -23,6 +23,13 @@ function deregister(win) {
     stack.removeObject(win);
 }
 
+//Catch focus and delegate to latest window
+Ember.$(document).on('focusin', handleTabIntoBrowser);
+function handleTabIntoBrowser(event) {
+    if (!stack.length) return;
+    stack[stack.length-1].focus();
+}
+
 module.exports = Em.Component.extend({
     layout: require('../templates/window-layout'),
 
@@ -30,7 +37,7 @@ module.exports = Em.Component.extend({
 
     classNameBindings: ['closable:window-closable', 'animated:window-animated'],
 
-    attributeBindings: ['style'],
+    attributeBindings: ['style', 'tabindex'],
 
     animated: true,
 
@@ -57,6 +64,8 @@ module.exports = Em.Component.extend({
     width: 500,
 
     isClosing: false,
+
+    tabindex: 0,
 
     willClose: function() {
 
@@ -228,23 +237,22 @@ module.exports = Em.Component.extend({
         });
     },
 
+    focus: function() {
+        if (!this.get('element').contains(document.activeElement)) {
+            this.$(':tabbable:first').focus();
+        }
+    },
+
     didKeyDown: function(e) {
         var key = e.keyCode || e.which;
-        switch (key) {
-            case $.keyCode.ESCAPE:
-                //Close the window on escape
+        if (key === 9) {
+            //Prevent tabbing outside the window
+            var tabbable = this.$(':tabbable'),
+                finalTabbable = tabbable[e.shiftKey ? 'first' : 'last']()[0];
+            if (finalTabbable === document.activeElement || this.get('element') === document.activeElement) {
                 e.preventDefault();
-                this.cancel();
-                break;
-            case $.keyCode.TAB:
-                //Prevent tabbing outside the window
-                var tabbable = this.$(':tabbable'),
-                    finalTabbable = tabbable[e.shiftKey ? 'first' : 'last']()[0];
-                if (finalTabbable === document.activeElement) {
-                    e.preventDefault();
-                    tabbable[e.shiftKey ? 'last' : 'first']()[0].focus();
-                }
-                break;
+                tabbable[e.shiftKey ? 'last' : 'first']()[0].focus();
+            }
         }
     }.on('keyDown'),
 
