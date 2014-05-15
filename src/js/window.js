@@ -37,7 +37,7 @@ module.exports = Em.Component.extend({
 
     classNameBindings: ['closable:window-closable', 'animated:window-animated'],
 
-    attributeBindings: ['style', 'tabindex'],
+    attributeBindings: ['style'],
 
     animated: true,
 
@@ -64,8 +64,6 @@ module.exports = Em.Component.extend({
     width: 500,
 
     isClosing: false,
-
-    tabindex: 0,
 
     willClose: function() {
 
@@ -237,9 +235,14 @@ module.exports = Em.Component.extend({
         });
     },
 
+    _focusTimeout: null,
     focus: function() {
         if (!this.get('element').contains(document.activeElement)) {
-            this.$(':tabbable:first').focus();
+            clearTimeout(this._focusTimeout);
+            var self = this;
+            this._focusTimeout = setTimeout(function() {
+                self.$(':tabbable:input:first').focus();
+            }, 100);
         }
     },
 
