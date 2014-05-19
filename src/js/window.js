@@ -24,11 +24,13 @@ function deregister(win) {
 }
 
 //Catch focus and delegate to latest window
-Ember.$(document).on('focusin', handleTabIntoBrowser);
-function handleTabIntoBrowser(event) {
+Ember.$(document).focusin(function() {
     if (!stack.length) return;
-    stack[stack.length-1].focus();
-}
+    Em.run.later(function() {
+        stack[stack.length-1].focus();
+    }, 1);
+});
+
 
 module.exports = Em.Component.extend({
     layout: require('../templates/window-layout'),
@@ -235,14 +237,9 @@ module.exports = Em.Component.extend({
         });
     },
 
-    _focusTimeout: null,
     focus: function() {
         if (!this.get('element').contains(document.activeElement)) {
-            clearTimeout(this._focusTimeout);
-            var self = this;
-            this._focusTimeout = setTimeout(function() {
-                self.$(':tabbable:input:first').focus();
-            }, 100);
+            this.$(':tabbable:input:first').focus();
         }
     },
 
