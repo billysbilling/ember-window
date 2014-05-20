@@ -26,9 +26,9 @@ function deregister(win) {
 //Catch focus and delegate to latest window
 Ember.$(document).focusin(function() {
     if (!stack.length) return;
-    Em.run.later(function() {
+    Em.run.once(function() {
         stack[stack.length-1].focus();
-    }, 1);
+    });
 });
 
 
