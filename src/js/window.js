@@ -238,7 +238,7 @@ module.exports = Em.Component.extend({
     },
 
     focus: function() {
-        if (!this.get('element').contains(document.activeElement)) {
+        if (this.get('element') && !this.get('element').contains(document.activeElement)) {
             this.$(':tabbable:input:first').focus();
         }
     },
