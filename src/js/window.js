@@ -1,4 +1,5 @@
-var functionProxy = require('function-proxy');
+var functionProxy = require('function-proxy'),
+    highestZIndex = require('highest-z-index');
 
 var ANIMATION_DURATION = 300,
     MODAL_MASK_CLICK_TOLERANCE = 1000,
@@ -8,11 +9,6 @@ var ANIMATION_DURATION = 300,
 function register(win) {
     deregister(win);
     var topWin = stack.get('lastObject');
-    if (topWin) {
-        win.set('zIndex', topWin.get('zIndex') + 10);
-    } else {
-        win.set('zIndex', 2000);
-    }
     if (win.get('win') === null) {
         win.set('topOffset', topWin ? TOP_OFFSET_INCREMENT + topWin.get('topOffset') : 0);
     }
@@ -88,13 +84,15 @@ module.exports = Em.Component.extend({
 
     show: function() {
         var self = this;
+        var zIndex = highestZIndex() + 2; //We add 2 so we can put the modal mask directly below the window
+        this.set('zIndex', zIndex);
         this.appendTo(this.container.lookup('application:main').get('rootElement'));
         if (this.get('isModal')) {
             var modalMask = this.get('modalMask'); //this window may have replaced another window and inherited its modal mask
             if (!modalMask) {
                 modalMask = this.container.lookup('component:modal-mask');
                 this.set('modalMask', modalMask);
-                modalMask.set('zIndex', this.get('zIndex') - 1);
+                modalMask.set('zIndex', zIndex - 1);
                 modalMask.show();
             }
             //Wait a second until listening for click events on modal mask. If user double clicks on an item which opens
