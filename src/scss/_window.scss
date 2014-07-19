@@ -23,8 +23,8 @@
             height: $large-line-height + 2*$tight-standard-padding + 1px;
             padding: $tight-standard-padding $window-padding;
             @include ellipsis;
-            background-color: $background-gray;
-            border-bottom: 1px solid $border-gray;
+            background-color: $blue-gray-xxlight;
+            border-bottom: 1px solid $blue-gray-xlight;
             @include border-top-radius($standard-border-radius);
 
             h1 {
@@ -67,8 +67,8 @@
         .window-footer {
             height: $large-line-height + 2*15px;
             padding: 15px $window-padding;
-            background-color: $background-gray;
-            border-top: 1px solid $border-gray;
+            background-color: $blue-gray-xxlight;
+            border-top: 1px solid $blue-gray-xlight;
             @include border-bottom-radius($standard-border-radius);
             text-align: center;
 
