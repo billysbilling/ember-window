@@ -1,5 +1,3 @@
-@import "compass/css3/transition";
-
 @mixin window {
     .window {
         $window-padding: 20px;
@@ -10,25 +8,28 @@
         top: $standard-padding;
         left: 50%;
         background-color: #fff;
-        @include box-shadow(rgba(0, 0, 0, 0.2) 0px 0px 20px 0px);
-        @include border-radius($standard-border-radius);
-        @include transform(scale(0.5, 0.5));
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 20px 0px;
+        border-radius: $standard-border-radius;
+        transform: scale(0.5, 0.5);
+        -webkit-transform: scale(0.5, 0.5);
         opacity: 0;
 
         &.window-animated {
-            @include transition(transform 0.25s ease-out, opacity 0.25s ease-out, filter 0.25s linear);
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out, filter 0.25s linear;
+            -webkit-transition: -webkit-transform 0.25s ease-out, opacity 0.25s ease-out, -webkit-filter 0.25s linear;
         }
 
         .window-header {
             height: $large-line-height + 2*$tight-standard-padding + 1px;
             padding: $tight-standard-padding $window-padding;
-            @include ellipsis;
+            text-overflow: ellipsis;
             background-color: $background-gray;
             border-bottom: 1px solid $border-gray;
-            @include border-top-radius($standard-border-radius);
+            border-top-left-radius: $standard-border-radius;
+            border-top-right-radius: $standard-border-radius;
 
             h1 {
-                @include ellipsis;
+                text-overflow: ellipsis;
             }
         }
 
@@ -69,7 +70,8 @@
             padding: 15px $window-padding;
             background-color: $background-gray;
             border-top: 1px solid $border-gray;
-            @include border-bottom-radius($standard-border-radius);
+            border-bottom-left-radius: $standard-border-radius;
+            border-bottom-right-radius: $standard-border-radius;
             text-align: center;
 
             .left {
@@ -81,15 +83,17 @@
         }
 
         &.visible {
-            @include transform(scale(1, 1));
+            transform: scale(1, 1);
+            -webkit-transform: scale(1, 1);
             opacity: 1;
         }
 
         &.pulse {
-            @include transition-property(-webkit-transform -moz-transform -ms-transform);
-            @include transition-duration(0.25s);
-            @include transition-duration(ease-out);
-            @include transform(scale(1.03, 1.03));
+            transition-property: transform -webkit-transform;
+            transition-duration: 0.25s;
+            transition-timing-function: ease-out;
+            transform: scale(1.03, 1.03);
+            -webkit-transform: scale(1.03, 1.03);
         }
 
     }
