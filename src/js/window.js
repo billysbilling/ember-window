@@ -20,9 +20,14 @@ function deregister(win) {
 }
 
 //Catch focus and delegate to latest window
-Ember.$(document).focusin(function() {
-    if (!stack.length) return;
-    Em.run.once(function() {
+Ember.$(document).focusin(function(e) {
+    if (!stack.length) {
+        return;
+    }
+    if ($(e.target).closest('.ember-window-allow-focus')) {
+        return;
+    }
+    Em.run(function() {
         stack[stack.length-1].focus();
     });
 });
