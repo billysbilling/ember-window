@@ -66,6 +66,8 @@ module.exports = Em.Component.extend({
 
     width: 500,
 
+    fullHeight: false,
+
     isClosing: false,
 
     willClose: function() {
@@ -212,8 +214,9 @@ module.exports = Em.Component.extend({
 
     _sizeBody: function() {
         var body = this.$('.window-body'),
-            h = ($(window).height() - this.get('top') - this.get('viewportPadding') - (this.$().outerHeight() - body.outerHeight()));
-        body.css('max-height', h+'px');
+            h = ($(window).height() - this.get('top') - this.get('viewportPadding') - (this.$().outerHeight() - body.outerHeight())),
+            heightProp = this.get('fullHeight') ? 'height' : 'max-height';
+        body.css(heightProp, h+'px');
     },
 
     _pulse: function() {
